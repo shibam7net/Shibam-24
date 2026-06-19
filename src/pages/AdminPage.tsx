@@ -129,6 +129,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [newsSection, setNewsSection] = useState<'arabic' | 'global'>('arabic');
   const [newsAuthor, setNewsAuthor] = useState('');
   const [newsSourceName, setNewsSourceName] = useState('شبام24');
+  const [newsSourceUrl, setNewsSourceUrl] = useState('');
   const [newsImage, setNewsImage] = useState('');
   const [newsVideo, setNewsVideo] = useState('');
   const [editingArticle, setEditingArticle] = useState<string | null>(null);
@@ -269,6 +270,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setNewsSection(article.section as 'arabic' | 'global');
     setNewsAuthor(article.author);
     setNewsSourceName(article.source_name);
+    setNewsSourceUrl(article.source_url || '');
     setNewsImage(article.image_url || '');
     setNewsVideo((article as any).video_url || '');
     setActiveTab('add-news');
@@ -280,7 +282,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       const payload: any = {
         title: newsTitle, summary: newsSummary, content: newsContent,
         category: newsCategory, section: newsSection, author: newsAuthor,
-        source_name: newsSourceName, image_url: newsImage || null,
+        source_name: newsSourceName, source_url: newsSourceUrl || null, image_url: newsImage || null,
         video_url: newsVideo || null,
       };
       if (editingArticle) payload.id = editingArticle;
@@ -292,7 +294,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const clearNewsForm = () => {
     setNewsTitle(''); setNewsSummary(''); setNewsContent(''); setNewsCategory('');
-    setNewsAuthor(''); setNewsImage(''); setNewsVideo(''); setNewsSourceName('شبام24');
+    setNewsAuthor(''); setNewsImage(''); setNewsVideo(''); setNewsSourceName('شبام24'); setNewsSourceUrl('');
     setEditingArticle(null);
   };
 
@@ -613,6 +615,10 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   <input value={newsSourceName} onChange={e => setNewsSourceName(e.target.value)} className="w-full bg-muted border border-border rounded-lg px-4 py-2 text-sm font-arabic outline-none focus:ring-2 focus:ring-primary" />
                 </div>
                 <div>
+                  <label className="text-sm font-arabic text-muted-foreground block mb-1">رابط المصدر</label>
+                  <input value={newsSourceUrl} onChange={e => setNewsSourceUrl(e.target.value)} placeholder="https://example.com/news-story" dir="ltr" className="w-full bg-muted border border-border rounded-lg px-4 py-2 text-sm font-english outline-none focus:ring-2 focus:ring-primary" />
+                </div>
+                <div>
                   <label className="text-sm font-arabic text-muted-foreground block mb-1">الصورة</label>
                   <div className="flex gap-2">
                     <input value={newsImage} onChange={e => setNewsImage(e.target.value)} placeholder="رابط الصورة أو ارفع من جهازك..." dir="ltr" className="flex-1 bg-muted border border-border rounded-lg px-4 py-2 text-sm font-english outline-none focus:ring-2 focus:ring-primary" />
@@ -644,7 +650,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                   title={newsTitle}
                   summary={newsSummary}
                   content={newsContent}
-                  sourceUrl={null}
+                  sourceUrl={newsSourceUrl || null}
                   section={newsSection}
                   onUpdate={(fields) => {
                     if (fields.title !== undefined) setNewsTitle(fields.title);

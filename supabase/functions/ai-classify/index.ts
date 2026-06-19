@@ -10,9 +10,11 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')!;
-const AI_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
-const MODEL = 'google/gemini-3-flash-preview';
+const AI_KEY = Deno.env.get('OPENROUTER_API_KEY') || Deno.env.get('LOVABLE_API_KEY');
+if (!AI_KEY) throw new Error('AI key not configured');
+const USING_OPENROUTER = !!Deno.env.get('OPENROUTER_API_KEY');
+const AI_URL = USING_OPENROUTER ? 'https://openrouter.ai/api/v1/chat/completions' : 'https://ai.gateway.lovable.dev/v1/chat/completions';
+const MODEL = Deno.env.get('AI_MODEL') || (USING_OPENROUTER ? 'google/gemini-2.5-flash' : 'google/gemini-3-flash-preview');
 
 async function sb(path: string, init: RequestInit = {}) {
   return fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -77,8 +79,9 @@ ${JSON.stringify(items.map(i => ({ id: i.id, title: i.title, summary: (i.summary
     res = await fetch(AI_URL, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${AI_KEY}`,
         'Content-Type': 'application/json',
+        ...(USING_OPENROUTER ? { 'HTTP-Referer': 'https://shibam7net.github.io/Shibam-24/', 'X-Title': 'Shibam-24' } : {}),
       },
       body: JSON.stringify({
         model: MODEL,

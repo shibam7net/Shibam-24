@@ -39,6 +39,7 @@ jobs:
       - name: Build project
         run: npm run build
         env:
+          NODE_OPTIONS: --max_old_space_size=4096
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
 
       - name: Create SPA fallback

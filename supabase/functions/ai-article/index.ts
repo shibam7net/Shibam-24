@@ -9,8 +9,21 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const AI_KEY = Deno.env.get("OPENROUTER_API_KEY") || Deno.env.get("LOVABLE_API_KEY");
+    if (!AI_KEY) throw new Error("AI key not configured");
+    const usingOpenRouter = !!Deno.env.get("OPENROUTER_API_KEY");
+    const AI_URL = usingOpenRouter
+      ? "https://openrouter.ai/api/v1/chat/completions"
+      : "https://ai.gateway.lovable.dev/v1/chat/completions";
+    const MODEL = Deno.env.get("AI_MODEL") || (usingOpenRouter ? "google/gemini-2.5-flash" : "google/gemini-3-flash-preview");
+    const aiHeaders: Record<string, string> = {
+      Authorization: `Bearer ${AI_KEY}`,
+      "Content-Type": "application/json",
+    };
+    if (usingOpenRouter) {
+      aiHeaders["HTTP-Referer"] = "https://shibam7net.github.io/Shibam-24/";
+      aiHeaders["X-Title"] = "Shibam-24";
+    }
 
     const { mode, title, newsTitles } = await req.json();
 
@@ -44,18 +57,16 @@ ${newsTitles}
       });
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch(AI_URL, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: aiHeaders,
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: MODEL,
         messages: [
           { role: "system", content: "أنت صحفي ومحلل سياسي محترف. أجب دائماً بصيغة JSON فقط بدون أي نص إضافي." },
           { role: "user", content: prompt },
         ],
+        response_format: { type: "json_object" },
       }),
     });
 
@@ -73,7 +84,7 @@ ${newsTitles}
       }
       const t = await response.text();
       console.error("AI error:", status, t);
-      throw new Error("AI gateway error");
+      throw new Error("AI provider error");
     }
 
     const data = await response.json();

@@ -24,3 +24,5 @@ npm run build
 
 - مشروع Supabase فعّال مع المتغيرات الموجودة في `.env`
 - أي أسرار خاصة بوظائف Supabase Edge يجب أن تبقى مضبوطة داخل Supabase نفسها
+- لتفعيل أدوات الذكاء الاصطناعي في لوحة التحكم استخدم سر `OPENROUTER_API_KEY` داخل Supabase Edge Functions secrets
+- يمكن تخصيص النموذج عبر السر `AI_MODEL`، والافتراضي مع OpenRouter هو `google/gemini-2.5-flash`
