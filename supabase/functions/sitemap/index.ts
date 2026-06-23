@@ -11,7 +11,7 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const siteUrl = "https://shabm.lovable.app";
+  const siteUrl = "https://shibam7net.github.io/Shibam-24";
 
   const { data: articles, count } = await supabase
     .from("articles")

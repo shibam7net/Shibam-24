@@ -144,7 +144,7 @@ export default function SettingsTab() {
           </div>
           <div>
             <label className={label}>robots.txt (محرر)</label>
-            <textarea dir="ltr" rows={6} className={`${input} font-mono text-xs`} value={local.seo.robots_txt} onChange={e => setSeo({ robots_txt: e.target.value })} placeholder={"User-agent: *\nAllow: /\nSitemap: https://shabm.lovable.app/sitemap.xml"} />
+            <textarea dir="ltr" rows={6} className={`${input} font-mono text-xs`} value={local.seo.robots_txt} onChange={e => setSeo({ robots_txt: e.target.value })} placeholder={"User-agent: *\nAllow: /\nSitemap: https://shibam7net.github.io/Shibam-24/sitemap.xml"} />
             <p className="text-[11px] text-muted-foreground font-arabic mt-1">يُحفظ في الإعدادات؛ يمكن استخدامه لاحقًا عبر edge function لخدمته ديناميكيًا.</p>
           </div>
           <div className="flex items-center gap-3 p-3 bg-muted rounded">

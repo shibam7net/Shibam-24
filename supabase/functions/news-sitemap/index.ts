@@ -1,7 +1,7 @@
 // Google News sitemap — articles from the last 48 hours only (per Google News spec).
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.99.2";
 
-const SITE = "https://shibam24.lovable.app";
+const SITE = "https://shibam7net.github.io/Shibam-24";
 
 function esc(s: string) {
   return String(s || "")

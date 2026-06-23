@@ -19,22 +19,29 @@ Deno.serve(async (req) => {
     // Check if admin user already exists
     const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
     const adminEmail = "shib@shibampress.local";
-    const exists = existingUsers?.users?.some((u: any) => u.email === adminEmail);
+    let adminUser = existingUsers?.users?.find((u: any) => u.email === adminEmail) || null;
 
-    if (!exists) {
-      const { error } = await supabaseAdmin.auth.admin.createUser({
+    if (!adminUser) {
+      const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
         email: adminEmail,
         password: "777492635",
         email_confirm: true,
         user_metadata: { username: "shib" },
       });
       if (error) throw error;
-      return new Response(JSON.stringify({ message: "Admin user created" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      adminUser = created.user;
     }
 
-    return new Response(JSON.stringify({ message: "Admin user already exists" }), {
+    if (!adminUser?.id) {
+      throw new Error("Admin user missing after create/list");
+    }
+
+    const { error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: adminUser.id, role: "admin" }, { onConflict: "user_id,role" });
+    if (roleError) throw roleError;
+
+    return new Response(JSON.stringify({ message: "Admin user ready", user_id: adminUser.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {

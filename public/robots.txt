@@ -19,5 +19,5 @@ Allow: /
 Disallow: /admin
 Disallow: /dashboard
 
-Sitemap: https://pqtfipryditlsthdczkq.supabase.co/functions/v1/sitemap
-Sitemap: https://pqtfipryditlsthdczkq.supabase.co/functions/v1/news-sitemap
+Sitemap: https://rgjiakkruuuitzwlqdxx.supabase.co/functions/v1/sitemap
+Sitemap: https://rgjiakkruuuitzwlqdxx.supabase.co/functions/v1/news-sitemap
