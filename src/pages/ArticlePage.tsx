@@ -119,6 +119,8 @@ export default function ArticlePage() {
   const videoUrl = (article as any).video_url || media.videoUrl;
   const videoPoster = media.poster || article.image_url || undefined;
   const heroImage = article.image_url || media.imageUrl || null;
+  const socialImageSource = article.image_url || media.imageUrl || null;
+  const socialImage = getProxiedImageUrl(socialImageSource) || undefined;
   const cleanedTitle = cleanTitle(article.title);
   const cleanedSummary = stripHtml(decodeHtml(article.summary || ''));
 
@@ -141,15 +143,16 @@ export default function ArticlePage() {
 
   const siteUrl = absoluteSiteUrl('/').replace(/\/$/, '');
   const articleSlug = (article as any).slug || article.id;
-  const articleUrl = `${siteUrl}/article/${articleSlug}`;
-  const metaTitle = cleanedTitle.slice(0, 60);
-  const metaDesc = (cleanedSummary || cleanContent.slice(0, 160)).slice(0, 160);
+  const articleUrl = absoluteSiteUrl(`/article/${encodeURIComponent(articleSlug)}`);
+  const metaTitle = cleanedTitle.slice(0, 110);
+  const metaDesc = (cleanedSummary || cleanContent.slice(0, 180)).slice(0, 180);
+  const hasSocialPreview = Boolean(socialImage);
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     "headline": cleanedTitle,
-    "image": article.image_url ? [article.image_url] : [],
+    ...(socialImage ? { "image": [socialImage] } : {}),
     "datePublished": article.published_at,
     "dateModified": article.created_at,
     "author": { "@type": "Person", "name": article.author || 'شبام24' },
@@ -180,20 +183,28 @@ export default function ArticlePage() {
       <Helmet>
         <title>{`${metaTitle} | شبام24`}</title>
         <meta name="description" content={metaDesc} />
-        <meta property="og:title" content={metaTitle} />
-        <meta property="og:description" content={metaDesc} />
-        {article.image_url && <meta property="og:image" content={article.image_url} />}
-        <meta property="og:url" content={articleUrl} />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Shibam24 - شبام24" />
-        <meta property="article:published_time" content={article.published_at} />
-        <meta property="article:modified_time" content={article.created_at} />
-        <meta property="article:section" content={article.category} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={metaTitle} />
-        <meta name="twitter:description" content={metaDesc} />
-        {article.image_url && <meta name="twitter:image" content={article.image_url} />}
         <link rel="canonical" href={articleUrl} />
+        {hasSocialPreview && (
+          <>
+            <meta property="og:title" content={metaTitle} />
+            <meta property="og:description" content={metaDesc} />
+            <meta property="og:url" content={articleUrl} />
+            <meta property="og:type" content="article" />
+            <meta property="og:site_name" content="Shibam24 - شبام24" />
+            <meta property="og:locale" content={isArabic ? 'ar_AR' : 'en_US'} />
+            <meta property="article:published_time" content={article.published_at} />
+            <meta property="article:modified_time" content={article.created_at} />
+            <meta property="article:section" content={article.category} />
+            <meta property="og:image" content={socialImage} />
+            <meta property="og:image:secure_url" content={socialImage} />
+            <meta property="og:image:alt" content={cleanedTitle} />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={metaTitle} />
+            <meta name="twitter:description" content={metaDesc} />
+            <meta name="twitter:image" content={socialImage} />
+            <meta name="twitter:image:alt" content={cleanedTitle} />
+          </>
+        )}
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
       </Helmet>

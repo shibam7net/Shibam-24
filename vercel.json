@@ -3,7 +3,11 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/((?!.*\\.).*)",
+      "source": "/article/(.*)",
+      "destination": "/api/article?slug=$1"
+    },
+    {
+      "source": "/((?!api/)(?!.*\\.).*)",
       "destination": "/index.html"
     }
   ],
