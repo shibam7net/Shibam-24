@@ -8,9 +8,11 @@ import { cleanTitle, stripHtml } from '@/lib/decodeHtml';
 import { getSmartTimeAgo } from '@/lib/timeAgo';
 import { getArticlePath } from '@/hooks/useArticles';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 export default function ArticlesPage() {
   const { data: dbArticles = [], isLoading } = useArticles();
+  const { metaTitle: siteMetaTitle, robots } = useResolvedSeo();
 
   const articles = useMemo(() =>
     dbArticles
@@ -22,8 +24,9 @@ export default function ArticlesPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>مقالات | شبام24</title>
+        <title>{`مقالات | ${siteMetaTitle}`}</title>
         <meta name="description" content="مقالات وتحليلات وآراء من شبام24 - أحدث المقالات العربية والعالمية" />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={absoluteSiteUrl("/articles")} />
       </Helmet>
       <SiteHeader />

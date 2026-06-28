@@ -7,8 +7,21 @@ function json(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
+function extractTagValues(xml, tagName) {
+  const regex = new RegExp(`<${tagName}>([\\s\\S]*?)<\\/${tagName}>`, 'gi');
+  const values = [];
+  let match;
+  while ((match = regex.exec(String(xml || '')))) {
+    values.push(match[1].trim());
+  }
+  return values;
+}
+
 async function fetchText(url) {
-  const response = await fetch(url, { headers: { Accept: 'text/plain, application/xml, text/xml' }, cache: 'no-store' });
+  const response = await fetch(`${url}${url.includes('?') ? '&' : '?'}seo_check=${Date.now()}`, {
+    headers: { Accept: 'text/plain, application/xml, text/xml, application/json' },
+    cache: 'no-store',
+  });
   const text = await response.text();
   return { ok: response.ok, status: response.status, text };
 }
@@ -33,15 +46,23 @@ export default async function handler(_req, res) {
       fetchText(robotsUrl),
     ]);
 
+    const sitemapLocs = extractTagValues(sitemap.text, 'loc');
+    const newsLocs = extractTagValues(newsSitemap.text, 'loc');
+    const sitemapLocSet = new Set(sitemapLocs);
+    const newsLocSet = new Set(newsLocs);
     const sampleArticleUrls = articleUrls.slice(0, 20);
-    const sitemapHasValidArticleUrls = sampleArticleUrls.every((url) => sitemap.text.includes(url));
-    const sitemapHasReadableUrls = !hasPercentEncoding(sitemap.text);
-    const canonicalConsistency = sampleArticleUrls.every((url) => sitemap.text.includes(url) && !hasPercentEncoding(url));
+    const sampleNewsUrls = articleUrls.slice(0, 20).filter((url) => newsLocSet.has(url));
+
+    const sitemapHasValidArticleUrls = sampleArticleUrls.every((url) => sitemapLocSet.has(url));
+    const sitemapHasReadableUrls = sitemapLocs.every((loc) => !hasPercentEncoding(loc));
+    const newsHasReadableUrls = newsLocs.every((loc) => !hasPercentEncoding(loc));
+    const canonicalConsistency = sampleArticleUrls.every((url) => !hasPercentEncoding(url));
     const robotsIncludesSitemaps = robots.text.includes(sitemapUrl) && robots.text.includes(newsSitemapUrl);
-    const lastUpdatedMatches = expectedLatestUpdate ? sitemap.text.includes(expectedLatestUpdate) : true;
+    const sitemapLastmods = extractTagValues(sitemap.text, 'lastmod');
+    const lastUpdatedMatches = expectedLatestUpdate ? sitemapLastmods.includes(expectedLatestUpdate) : true;
 
     const payload = {
-      active: sitemap.ok && newsSitemap.ok && robots.ok && sitemapHasValidArticleUrls && sitemapHasReadableUrls,
+      active: sitemap.ok && newsSitemap.ok && robots.ok && sitemapHasValidArticleUrls && sitemapHasReadableUrls && newsHasReadableUrls && canonicalConsistency && robotsIncludesSitemaps && lastUpdatedMatches,
       siteUrl: SITE_URL,
       sitemapUrl,
       newsSitemapUrl,
@@ -53,9 +74,13 @@ export default async function handler(_req, res) {
         newsSitemapReachable: { ok: newsSitemap.ok, status: newsSitemap.status },
         robotsReachable: { ok: robots.ok, status: robots.status },
         validArticleUrls: { ok: sitemapHasValidArticleUrls, checked: sampleArticleUrls.length },
-        readableCanonicalUrls: { ok: sitemapHasReadableUrls && canonicalConsistency },
+        readableCanonicalUrls: { ok: sitemapHasReadableUrls && newsHasReadableUrls && canonicalConsistency, checked: sitemapLocs.length + newsLocs.length },
         robotsIncludesSitemaps: { ok: robotsIncludesSitemaps },
         lastUpdatedTimestamp: { ok: lastUpdatedMatches, expected: expectedLatestUpdate },
+      },
+      samples: {
+        sitemapLocs: sitemapLocs.slice(0, 5),
+        newsLocs: sampleNewsUrls.slice(0, 5),
       },
     };
 

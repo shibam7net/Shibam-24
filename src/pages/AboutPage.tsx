@@ -2,14 +2,17 @@ import { Helmet } from 'react-helmet-async';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 export default function AboutPage() {
   const url = absoluteSiteUrl('/about');
+  const { metaTitle: siteMetaTitle, robots } = useResolvedSeo();
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
-        <title>من نحن | شبام24</title>
+        <title>{`من نحن | ${siteMetaTitle}`}</title>
         <meta name="description" content="شبام24 منصة إخبارية عربية وعالمية مستقلة تقدم أخبارًا عاجلة وتقارير وتحليلات موثوقة على مدار الساعة." />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
         <meta property="og:title" content="من نحن — شبام24" />
         <meta property="og:url" content={url} />

@@ -2,14 +2,17 @@ import { Helmet } from 'react-helmet-async';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 export default function PrivacyPolicyPage() {
   const url = absoluteSiteUrl('/privacy-policy');
+  const { metaTitle: siteMetaTitle, robots } = useResolvedSeo();
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
-        <title>سياسة الخصوصية | شبام24</title>
+        <title>{`سياسة الخصوصية | ${siteMetaTitle}`}</title>
         <meta name="description" content="سياسة الخصوصية لموقع شبام24: كيف نجمع البيانات، كيف نستخدمها، ملفات تعريف الارتباط، حقوق المستخدمين، وحماية المعلومات." />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
         <meta property="og:title" content="سياسة الخصوصية — شبام24" />
         <meta property="og:url" content={url} />

@@ -18,6 +18,7 @@ import { arabicCategories, globalCategories } from '@/data/mockNews';
 import { supabase } from '@/integrations/supabase/client';
 import { cleanTitle, stripHtml } from '@/lib/decodeHtml';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 function toNewsArticle(a: Article) {
   return {
@@ -56,6 +57,7 @@ export default function Index() {
   }, [activeTab]);
 
   const { data, isLoading } = useArticlesPage({ section: activeTab, page });
+  const { metaTitle: siteMetaTitle, metaDescription: siteMetaDescription, robots } = useResolvedSeo();
   const rows = data?.rows || [];
   const totalPages = data?.totalPages || 1;
 
@@ -85,7 +87,9 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>{page === 1 ? 'شبام24 — أخبار عربية وعالمية' : `شبام24 — صفحة ${page}`}</title>
+        <title>{page === 1 ? siteMetaTitle : `${siteMetaTitle} — صفحة ${page}`}</title>
+        <meta name="description" content={page === 1 ? siteMetaDescription : `${siteMetaDescription} — صفحة ${page}`} />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={canonical} />
         {page > 1 && <link rel="prev" href={absoluteSiteUrl(page === 2 ? '/' : `/page/${page - 1}`)} />}
         {page < totalPages && <link rel="next" href={absoluteSiteUrl(`/page/${page + 1}`)} />}

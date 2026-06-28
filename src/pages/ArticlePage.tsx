@@ -15,6 +15,7 @@ import { trackPageView } from '@/lib/analytics';
 import { absoluteSiteUrl } from '@/lib/site';
 import { getArticleSlug, getArticleUrl } from '@/lib/articleUrls';
 import { getProxiedImageUrl } from '@/lib/imageProxy';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 function HeroImage({ url, alt }: { url: string; alt: string }) {
   const [failed, setFailed] = useState(false);
@@ -70,6 +71,7 @@ export default function ArticlePage() {
   const { data: article, isLoading } = useArticle(slug || '');
   const { data: allArticles = [] } = useArticles();
   const { data: allSources = [] } = useSources();
+  const { robots } = useResolvedSeo();
 
   useEffect(() => {
     if (!article?.id) return;
@@ -192,6 +194,7 @@ export default function ArticlePage() {
       <Helmet>
         <title>{`${metaTitle} | شبام24`}</title>
         <meta name="description" content={metaDesc} />
+        <meta name="robots" content={`${robots},max-image-preview:large`} />
         <link rel="canonical" href={articleUrl} />
         <meta property="og:title" content={metaTitle} />
         <meta property="og:description" content={metaDesc} />

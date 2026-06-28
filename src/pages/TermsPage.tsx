@@ -2,14 +2,17 @@ import { Helmet } from 'react-helmet-async';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 export default function TermsPage() {
   const url = absoluteSiteUrl('/terms');
+  const { metaTitle: siteMetaTitle, robots } = useResolvedSeo();
   return (
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
-        <title>شروط الاستخدام | شبام24</title>
+        <title>{`شروط الاستخدام | ${siteMetaTitle}`}</title>
         <meta name="description" content="شروط استخدام موقع شبام24 الإخباري: حقوق النشر، مسؤولية المحتوى، الاستخدام المقبول، وقواعد إعادة النشر." />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
         <meta property="og:title" content="شروط الاستخدام — شبام24" />
         <meta property="og:url" content={url} />

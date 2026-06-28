@@ -15,6 +15,7 @@ import { type Article } from '@/hooks/useArticles';
 import { arabicCategories, globalCategories } from '@/data/mockNews';
 import { cleanTitle, stripHtml } from '@/lib/decodeHtml';
 import { absoluteSiteUrl } from '@/lib/site';
+import { useResolvedSeo } from '@/hooks/useResolvedSeo';
 
 function toNewsArticle(a: Article) {
   return {
@@ -57,6 +58,7 @@ export default function SectionPage() {
     category: selectedCategory,
     page,
   });
+  const { metaTitle: siteMetaTitle, robots } = useResolvedSeo();
   const rows = data?.rows || [];
   const totalPages = data?.totalPages || 1;
 
@@ -91,8 +93,9 @@ export default function SectionPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>{`${titleWithPage} | شبام24`}</title>
+        <title>{`${titleWithPage} | ${siteMetaTitle}`}</title>
         <meta name="description" content={`${pageTitle} - شبام24 منصة إخبارية شاملة.`} />
+        <meta name="robots" content={robots} />
         <link rel="canonical" href={canonical} />
         <meta property="og:title" content={titleWithPage} />
         <meta property="og:url" content={canonical} />

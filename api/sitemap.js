@@ -9,7 +9,27 @@ function respond(res, status, body, contentType = 'application/xml; charset=utf-
   res.end(body);
 }
 
+function buildFallbackSitemap(now = new Date().toISOString()) {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${xmlEscape(`${SITE_URL}/`)}</loc>
+    <lastmod>${xmlEscape(now)}</lastmod>
+    <changefreq>always</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url><loc>${xmlEscape(`${SITE_URL}/about`)}</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>${xmlEscape(`${SITE_URL}/privacy-policy`)}</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>${xmlEscape(`${SITE_URL}/terms`)}</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>${xmlEscape(`${SITE_URL}/articles`)}</loc><lastmod>${xmlEscape(now)}</lastmod><changefreq>daily</changefreq><priority>0.8</priority></url>
+  <url><loc>${xmlEscape(`${SITE_URL}/section/arabic`)}</loc><lastmod>${xmlEscape(now)}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
+  <url><loc>${xmlEscape(`${SITE_URL}/section/global`)}</loc><lastmod>${xmlEscape(now)}</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
+</urlset>`;
+}
+
 export default async function handler(_req, res) {
+  res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=3600');
+
   try {
     const articles = await fetchArticles({
       select: 'id,slug,title,published_at,created_at,section',
@@ -65,11 +85,9 @@ export default async function handler(_req, res) {
     }
 
     xml += '\n</urlset>';
-
-    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300, stale-while-revalidate=3600');
     return respond(res, 200, xml);
   } catch (error) {
     console.error('sitemap handler error', error);
-    return respond(res, 500, 'Internal Server Error', 'text/plain; charset=utf-8');
+    return respond(res, 200, buildFallbackSitemap());
   }
 }
