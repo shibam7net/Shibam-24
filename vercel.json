@@ -4,6 +4,13 @@
   "rewrites": [
     {
       "source": "/article/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|Xbot|WhatsApp|TelegramBot|Slackbot|Discordbot|LinkedInBot|SkypeUriPreview|Googlebot|bingbot).*"
+        }
+      ],
       "destination": "/api/article?slug=$1"
     },
     {

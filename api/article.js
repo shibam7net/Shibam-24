@@ -2,7 +2,7 @@ const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL |
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxdGZpcHJ5ZGl0bHN0aGRjemtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTc4NzgsImV4cCI6MjA4OTI3Mzg3OH0.wdS_FIpMPlyQHbsi9f1Uxfd209cOmDgfOd24XpFD0PY';
 const SITE_URL = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://shibam-24.vercel.app').replace(/\/$/, '');
 const SITE_NAME = 'Shibam24 - شبام24';
-const SOCIAL_BOT_RE = /(facebookexternalhit|Facebot|Twitterbot|Xbot|WhatsApp|TelegramBot|Slackbot|Discordbot|LinkedInBot|SkypeUriPreview|Googlebot|bingbot)/i;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 function decodeHtml(text = '') {
   return String(text)
@@ -79,7 +79,7 @@ function safeUrl(url) {
 
 function getOgImageUrl(imageUrl) {
   const safe = safeUrl(imageUrl);
-  if (!safe) return null;
+  if (!safe) return DEFAULT_OG_IMAGE;
   return `${SITE_URL}/api/image-proxy?url=${encodeURIComponent(safe)}`;
 }
 
@@ -188,6 +188,7 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
     <meta property="og:image:secure_url" content="${encodedOgImage}" />
     <meta property="og:image:alt" content="${encodedImageAlt}" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Shibam24" />
     <meta name="twitter:title" content="${encodedSocialTitle}" />
     <meta name="twitter:description" content="${encodedMetaDescription}" />
     <meta name="twitter:image" content="${encodedOgImage}" />
@@ -438,14 +439,7 @@ export default async function handler(req, res) {
     const canonicalUrl = `${SITE_URL}/article/${encodeURIComponent(canonicalSlug)}`;
     const metaDescription = trimText(article.summary || article.content || article.title || '', 180);
     const sourceImage = extractFirstImageUrl(article);
-    const ogImageUrl = sourceImage ? getOgImageUrl(sourceImage) : null;
-    const isSocialBot = SOCIAL_BOT_RE.test(String(req.headers['user-agent'] || ''));
-
-    if (!ogImageUrl && isSocialBot) {
-      res.statusCode = 204;
-      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
-      return res.end();
-    }
+    const ogImageUrl = getOgImageUrl(sourceImage);
 
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
     return respond(res, 200, renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl));

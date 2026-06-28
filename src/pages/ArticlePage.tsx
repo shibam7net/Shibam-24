@@ -120,7 +120,7 @@ export default function ArticlePage() {
   const videoPoster = media.poster || article.image_url || undefined;
   const heroImage = article.image_url || media.imageUrl || null;
   const socialImageSource = article.image_url || media.imageUrl || null;
-  const socialImage = getProxiedImageUrl(socialImageSource) || undefined;
+  const socialImage = getProxiedImageUrl(socialImageSource) || absoluteSiteUrl('/og-image.png');
   const cleanedTitle = cleanTitle(article.title);
   const cleanedSummary = stripHtml(decodeHtml(article.summary || ''));
 
@@ -145,8 +145,7 @@ export default function ArticlePage() {
   const articleSlug = (article as any).slug || article.id;
   const articleUrl = absoluteSiteUrl(`/article/${encodeURIComponent(articleSlug)}`);
   const metaTitle = cleanedTitle.slice(0, 110);
-  const metaDesc = (cleanedSummary || cleanContent.slice(0, 180)).slice(0, 180);
-  const hasSocialPreview = Boolean(socialImage);
+  const metaDesc = (cleanedSummary || cleanContent.slice(0, 180) || cleanedTitle).slice(0, 180);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -184,27 +183,24 @@ export default function ArticlePage() {
         <title>{`${metaTitle} | شبام24`}</title>
         <meta name="description" content={metaDesc} />
         <link rel="canonical" href={articleUrl} />
-        {hasSocialPreview && (
-          <>
-            <meta property="og:title" content={metaTitle} />
-            <meta property="og:description" content={metaDesc} />
-            <meta property="og:url" content={articleUrl} />
-            <meta property="og:type" content="article" />
-            <meta property="og:site_name" content="Shibam24 - شبام24" />
-            <meta property="og:locale" content={isArabic ? 'ar_AR' : 'en_US'} />
-            <meta property="article:published_time" content={article.published_at} />
-            <meta property="article:modified_time" content={article.created_at} />
-            <meta property="article:section" content={article.category} />
-            <meta property="og:image" content={socialImage} />
-            <meta property="og:image:secure_url" content={socialImage} />
-            <meta property="og:image:alt" content={cleanedTitle} />
-            <meta name="twitter:card" content="summary_large_image" />
-            <meta name="twitter:title" content={metaTitle} />
-            <meta name="twitter:description" content={metaDesc} />
-            <meta name="twitter:image" content={socialImage} />
-            <meta name="twitter:image:alt" content={cleanedTitle} />
-          </>
-        )}
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDesc} />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Shibam24 - شبام24" />
+        <meta property="og:locale" content={isArabic ? 'ar_AR' : 'en_US'} />
+        <meta property="article:published_time" content={article.published_at} />
+        <meta property="article:modified_time" content={article.created_at} />
+        <meta property="article:section" content={article.category} />
+        <meta property="og:image" content={socialImage} />
+        <meta property="og:image:secure_url" content={socialImage} />
+        <meta property="og:image:alt" content={cleanedTitle} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Shibam24" />
+        <meta name="twitter:title" content={metaTitle} />
+        <meta name="twitter:description" content={metaDesc} />
+        <meta name="twitter:image" content={socialImage} />
+        <meta name="twitter:image:alt" content={cleanedTitle} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
       </Helmet>
