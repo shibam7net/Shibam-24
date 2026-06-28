@@ -16,7 +16,6 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
   const isArabic = article.section === 'arabic';
   const timeAgo = getSmartTimeAgo(article.publishDate, isArabic);
   const [imgFailed, setImgFailed] = useState(false);
-  const [useProxy, setUseProxy] = useState(false);
 
   const media = useMemo(
     () => extractMedia(`${article.title || ''} ${article.summary || ''} ${article.content || ''}`),
@@ -24,7 +23,7 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
   );
 
   const directImage = article.image || media.poster || media.imageUrl || null;
-  const imgSrc = useProxy ? getProxiedImageUrl(directImage) : directImage;
+  const imgSrc = getProxiedImageUrl(directImage);
   const hasImage = !!imgSrc && !imgFailed;
   const hasVideo = !!(article.video || (article as any).video_url || media.videoUrl);
   const slug = (article as any).slug;
@@ -35,8 +34,7 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
     : stripHtml(decodeHtml(article.content)).slice(0, 150);
 
   const handleImgError = () => {
-    if (!useProxy && directImage) setUseProxy(true);
-    else setImgFailed(true);
+    setImgFailed(true);
   };
 
   return (

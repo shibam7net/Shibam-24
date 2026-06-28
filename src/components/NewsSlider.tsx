@@ -13,7 +13,6 @@ interface NewsSliderProps {
 export default function NewsSlider({ articles, isArabic = true }: NewsSliderProps) {
   const [current, setCurrent] = useState(0);
   const [imgFailed, setImgFailed] = useState<Record<number, boolean>>({});
-  const [useProxy, setUseProxy] = useState<Record<number, boolean>>({});
   const slidesToShow = articles.filter(a => !!a.image).slice(0, 8);
 
   const next = useCallback(() => {
@@ -33,15 +32,11 @@ export default function NewsSlider({ articles, isArabic = true }: NewsSliderProp
 
   const article = slidesToShow[current];
   const direct = article.image || null;
-  const imgSrc = useProxy[current] ? getProxiedImageUrl(direct) : direct;
+  const imgSrc = getProxiedImageUrl(direct);
   const hasImage = !!imgSrc && !imgFailed[current];
 
   const handleErr = () => {
-    if (!useProxy[current] && direct) {
-      setUseProxy(p => ({ ...p, [current]: true }));
-    } else {
-      setImgFailed(p => ({ ...p, [current]: true }));
-    }
+    setImgFailed(p => ({ ...p, [current]: true }));
   };
 
   return (

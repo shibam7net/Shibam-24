@@ -13,6 +13,23 @@ export default defineConfig(({ mode }) => ({
       overlay: false,
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/hls.js/")) return "hls";
+          if (id.includes("/framer-motion/")) return "motion";
+          if (id.includes("/@supabase/")) return "supabase";
+          if (id.includes("/@tanstack/")) return "tanstack";
+          if (id.includes("/react-router-dom/") || id.includes("/react-router/")) return "router";
+          if (id.includes("/react-dom/") || id.includes("/react/") || id.includes("/scheduler/")) return "react-core";
+          if (id.includes("/recharts/")) return "charts";
+          if (id.includes("/@radix-ui/") || id.includes("/cmdk/") || id.includes("/vaul/")) return "ui-kit";
+        },
+      },
+    },
+  },
   plugins: [
     react(),
     mode === "development" && componentTagger(),
