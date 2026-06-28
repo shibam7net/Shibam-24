@@ -1,4 +1,4 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import SiteHeader from '@/components/SiteHeader';
 import SiteFooter from '@/components/SiteFooter';
@@ -66,6 +66,7 @@ function ArticleSkeleton() {
 export default function ArticlePage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: article, isLoading } = useArticle(slug || '');
   const { data: allArticles = [] } = useArticles();
   const { data: allSources = [] } = useSources();
@@ -73,12 +74,16 @@ export default function ArticlePage() {
   useEffect(() => {
     if (!article?.id) return;
     trackPageView(getArticlePath(article), article.id);
+  }, [article]);
+
+  useEffect(() => {
+    if (!article?.id) return;
 
     const canonicalPath = getArticlePath(article);
-    if (slug && canonicalPath !== `/article/${slug}`) {
-      navigate(canonicalPath, { replace: true });
+    if (location.pathname !== canonicalPath) {
+      navigate({ pathname: canonicalPath, search: location.search, hash: location.hash }, { replace: true });
     }
-  }, [article, navigate, slug]);
+  }, [article, location.hash, location.pathname, location.search, navigate]);
 
   if (!article && isLoading) return <ArticleSkeleton />;
 

@@ -1,4 +1,4 @@
-import { getArticleUrl, getCanonicalArticleSlug, normalizeExistingArticleSlug, safeDecodeSlug } from './_lib/article-url.js';
+import { getArticleUrl, getCanonicalArticleSlug, hasPercentEncoding, normalizeExistingArticleSlug, safeDecodeSlug } from './_lib/article-url.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://pqtfipryditlsthdczkq.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxdGZpcHJ5ZGl0bHN0aGRjemtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTc4NzgsImV4cCI6MjA4OTI3Mzg3OH0.wdS_FIpMPlyQHbsi9f1Uxfd209cOmDgfOd24XpFD0PY';
@@ -430,14 +430,22 @@ function respond(res, status, body, contentType = 'text/html; charset=utf-8') {
   res.end(body);
 }
 
+function getRawSlugParam(req) {
+  const rawUrl = String(req?.url || '');
+  const match = rawUrl.match(/[?&]slug=([^&]+)/i);
+  return match ? match[1].replace(/\+/g, '%20').trim() : '';
+}
+
 export default async function handler(req, res) {
   try {
-    const slug = String(req.query?.slug || '').trim();
-    if (!slug) {
+    const rawSlugParam = getRawSlugParam(req);
+    const rawSlug = String(req.query?.slug || safeDecodeSlug(rawSlugParam) || '').trim();
+    if (!rawSlug) {
       return respond(res, 400, 'Missing article slug', 'text/plain; charset=utf-8');
     }
 
-    const article = await fetchArticle(slug);
+    const normalizedSlug = normalizeExistingArticleSlug(rawSlug);
+    const article = await fetchArticle(rawSlug) || (normalizedSlug && normalizedSlug !== rawSlug ? await fetchArticle(normalizedSlug) : null);
     if (!article) {
       res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
       return respond(res, 404, '<!doctype html><html lang="ar"><head><meta charset="utf-8"><title>المقال غير موجود</title></head><body>المقال غير موجود</body></html>');
@@ -445,10 +453,17 @@ export default async function handler(req, res) {
 
     const canonicalSlug = getCanonicalArticleSlug(article);
     const canonicalUrl = getArticleUrl(article);
-    const requestedSlug = normalizeExistingArticleSlug(slug);
-    if (requestedSlug && requestedSlug !== canonicalSlug) {
+    const requestedSlug = normalizeExistingArticleSlug(rawSlug);
+    const rawRequestSlug = String(rawSlugParam || '').replace(/^\/+|\/+$/g, '');
+    const encodedCanonicalSlug = encodeURIComponent(canonicalSlug);
+    const matchesCanonicalRequest = rawRequestSlug
+      ? rawRequestSlug === canonicalSlug || rawRequestSlug === encodedCanonicalSlug
+      : rawSlug === canonicalSlug;
+    const hasEncodedRequestSlug = hasPercentEncoding(rawRequestSlug) || hasPercentEncoding(rawSlug);
+    if (!matchesCanonicalRequest && ((requestedSlug && requestedSlug !== canonicalSlug) || hasEncodedRequestSlug || rawSlug !== canonicalSlug)) {
       res.statusCode = 301;
-      res.setHeader('Location', canonicalUrl);
+      res.setHeader('Location', encodeURI(canonicalUrl));
+      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
       res.end();
       return;
     }
