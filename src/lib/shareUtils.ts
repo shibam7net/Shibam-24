@@ -1,12 +1,11 @@
 import type { NewsArticle } from '@/data/mockNews';
-import { absoluteSiteUrl } from '@/lib/site';
+import { getArticleUrl } from '@/lib/articleUrls';
 
 const SITE_NAME = 'Shibam24';
 const HASHTAG = '#Shibam24';
 
 function articleUrl(article: NewsArticle) {
-  const slug = (article as any).slug;
-  return absoluteSiteUrl(`/article/${slug || article.id}`);
+  return getArticleUrl(article as any);
 }
 
 export function shareToWhatsApp(article: NewsArticle) {

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { getArticlePath as buildArticlePath, normalizeExistingArticleSlug, safeDecodeSlug } from '@/lib/articleUrls';
 
 export interface Article {
   id: string;
@@ -127,14 +128,23 @@ export function useArticle(idOrSlug: string) {
   return useQuery({
     queryKey: ['article', idOrSlug],
     queryFn: async () => {
-      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
-      if (isUuid) {
-        const { data, error } = await supabase.from('articles').select('*').eq('id', idOrSlug).single();
-        if (error) throw error;
-        return data as Article;
+      const candidates = Array.from(new Set([
+        idOrSlug,
+        safeDecodeSlug(idOrSlug),
+        normalizeExistingArticleSlug(idOrSlug),
+      ].map((value) => String(value || '').trim()).filter(Boolean)));
+
+      const uuidCandidate = candidates.find((value) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value));
+      if (uuidCandidate) {
+        const { data, error } = await supabase.from('articles').select('*').eq('id', uuidCandidate).single();
+        if (!error && data) return data as Article;
       }
-      const { data, error } = await supabase.from('articles').select('*').eq('slug', idOrSlug).single();
-      if (!error && data) return data as Article;
+
+      if (candidates.length > 0) {
+        const { data, error } = await supabase.from('articles').select('*').in('slug', candidates).limit(1);
+        if (!error && data && data[0]) return data[0] as Article;
+      }
+
       const { data: data2, error: error2 } = await supabase.from('articles').select('*').eq('id', idOrSlug).single();
       if (error2) throw error2;
       return data2 as Article;
@@ -144,16 +154,22 @@ export function useArticle(idOrSlug: string) {
     gcTime: 30 * 60 * 1000,
     // Instant render from list cache — no spinner when navigating from a list view.
     placeholderData: () => {
+      const lookup = new Set([
+        idOrSlug,
+        safeDecodeSlug(idOrSlug),
+        normalizeExistingArticleSlug(idOrSlug),
+      ].map((value) => String(value || '').trim()).filter(Boolean));
+
       const lists = qc.getQueriesData<Article[]>({ queryKey: ['articles'] });
       for (const [, rows] of lists) {
         if (!rows) continue;
-        const hit = rows.find((r) => r.id === idOrSlug || r.slug === idOrSlug);
+        const hit = rows.find((r) => lookup.has(r.id) || lookup.has(String(r.slug || '').trim()) || lookup.has(normalizeExistingArticleSlug(r.slug)));
         if (hit) return hit as Article;
       }
       const infinite = qc.getQueriesData<any>({ queryKey: ['articles-infinite'] });
       for (const [, data] of infinite) {
         for (const page of data?.pages || []) {
-          const hit = page.rows?.find((r: Article) => r.id === idOrSlug || r.slug === idOrSlug);
+          const hit = page.rows?.find((r: Article) => lookup.has(r.id) || lookup.has(String(r.slug || '').trim()) || lookup.has(normalizeExistingArticleSlug(r.slug)));
           if (hit) return hit as Article;
         }
       }
@@ -197,7 +213,10 @@ export function useUpsertArticle() {
         return [saved, ...rows];
       });
       qc.setQueryData(['article', saved.id], saved);
-      if (saved.slug) qc.setQueryData(['article', saved.slug], saved);
+      if (saved.slug) {
+        qc.setQueryData(['article', saved.slug], saved);
+        qc.setQueryData(['article', normalizeExistingArticleSlug(saved.slug)], saved);
+      }
     },
   });
 }
@@ -257,6 +276,6 @@ export function useBulkDeleteArticles() {
   });
 }
 
-export function getArticlePath(article: { slug?: string | null; id: string }): string {
-  return `/article/${article.slug || article.id}`;
+export function getArticlePath(article: { slug?: string | null; id: string; title?: string | null }): string {
+  return buildArticlePath(article);
 }

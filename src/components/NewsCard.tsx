@@ -6,6 +6,7 @@ import ShareButtons from './ShareButtons';
 import { decodeHtml, stripHtml, cleanTitle, extractMedia } from '@/lib/decodeHtml';
 import { getProxiedImageUrl } from '@/lib/imageProxy';
 import { getSmartTimeAgo } from '@/lib/timeAgo';
+import { getArticlePath } from '@/hooks/useArticles';
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -26,8 +27,7 @@ export default function NewsCard({ article, featured = false }: NewsCardProps) {
   const imgSrc = getProxiedImageUrl(directImage);
   const hasImage = !!imgSrc && !imgFailed;
   const hasVideo = !!(article.video || (article as any).video_url || media.videoUrl);
-  const slug = (article as any).slug;
-  const link = `/article/${slug || article.id}`;
+  const link = getArticlePath(article as any);
 
   const summary = article.summary
     ? stripHtml(decodeHtml(article.summary)).slice(0, 150)

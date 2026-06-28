@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { trackPageView } from '@/lib/analytics';
+import { getArticlePath } from '@/hooks/useArticles';
 
 /** Tracks every route change as a page view. Mount once inside <BrowserRouter>. */
 export function usePageTracking() {
@@ -16,6 +17,6 @@ export function useArticleView(articleId?: string | null) {
   const params = useParams();
   useEffect(() => {
     if (!articleId) return;
-    trackPageView(`/article/${params.slug ?? articleId}`, articleId);
+    trackPageView(getArticlePath({ id: articleId, slug: typeof params.slug === 'string' ? params.slug : null }), articleId);
   }, [articleId, params.slug]);
 }

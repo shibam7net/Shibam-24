@@ -1,23 +1,8 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Googlebot-News
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
 
 Disallow: /admin
 Disallow: /dashboard
 
-Sitemap: https://pqtfipryditlsthdczkq.supabase.co/functions/v1/sitemap
-Sitemap: https://pqtfipryditlsthdczkq.supabase.co/functions/v1/news-sitemap
+Sitemap: https://shibam-24.vercel.app/sitemap.xml
+Sitemap: https://shibam-24.vercel.app/news-sitemap.xml

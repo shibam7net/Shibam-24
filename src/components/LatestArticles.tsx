@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { NewsArticle } from '@/data/mockNews';
-import { decodeHtml , cleanTitle} from '@/lib/decodeHtml';
+import { cleanTitle } from '@/lib/decodeHtml';
 import { getProxiedImageUrl } from '@/lib/imageProxy';
+import { getArticlePath } from '@/hooks/useArticles';
 
 interface LatestArticlesProps {
   articles: NewsArticle[];
@@ -32,8 +33,7 @@ function ArticleCard({ article, isArabic }: { article: NewsArticle; isArabic: bo
   const [imgFailed, setImgFailed] = useState(false);
   const imgSrc = getProxiedImageUrl(article.image);
   const hasImage = !!imgSrc && !imgFailed;
-  const slug = (article as any).slug;
-  const link = `/article/${slug || article.id}`;
+  const link = getArticlePath(article as any);
 
   return (
     <Link

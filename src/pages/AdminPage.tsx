@@ -15,7 +15,8 @@ import ArticleEditorAI from '@/components/admin/ArticleEditorAI';
 import SponsorsAdminTab from '@/components/admin/SponsorsAdminTab';
 import SettingsTab from '@/components/admin/SettingsTab';
 import { toast } from 'sonner';
-import { absoluteSiteUrl, publicAssetUrl } from '@/lib/site';
+import { publicAssetUrl } from '@/lib/site';
+import { createArticleSlug, ensureUniqueArticleSlug, getArticleUrl, normalizeExistingArticleSlug } from '@/lib/articleUrls';
 
 type AdminTab = 'sources' | 'add-news' | 'news-manager' | 'ai-writer' | 'analytics' | 'radio' | 'sponsors' | 'settings';
 type SourceTab = 'arabic' | 'foreign';
@@ -279,11 +280,18 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const handleAddNews = async () => {
     if (!newsTitle || !newsContent) { toast.error('يرجى ملء العنوان والمحتوى'); return; }
     try {
+      const baseSlug = createArticleSlug(newsTitle);
+      const takenSlugs = allArticles
+        .filter(article => article.id !== editingArticle)
+        .map(article => normalizeExistingArticleSlug(article.slug || article.id));
+      const slug = ensureUniqueArticleSlug(baseSlug, takenSlugs);
+
       const payload: any = {
         title: newsTitle, summary: newsSummary, content: newsContent,
         category: newsCategory, section: newsSection, author: newsAuthor,
         source_name: newsSourceName, source_url: newsSourceUrl || null, image_url: newsImage || null,
         video_url: newsVideo || null,
+        slug,
       };
       if (editingArticle) payload.id = editingArticle;
       await upsertArticle.mutateAsync(payload);
@@ -320,8 +328,7 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     setAiProcessing(prev => ({ ...prev, [article.id]: 'distribute' }));
     try { await supabase.functions.invoke('ai-optimize', { body: { articleId: article.id, action: 'optimize' } }); } catch {}
 
-    const slug = (article as any).slug || article.id;
-    const url = absoluteSiteUrl(`/article/${slug}`);
+    const url = getArticleUrl(article as any);
     const results: string[] = [];
 
     try {
@@ -767,10 +774,16 @@ function AIWriterTab({ allArticles, upsertArticle }: { allArticles: Article[]; u
   const handlePublish = async () => {
     if (!aiResult) return;
     try {
+      const baseSlug = createArticleSlug(aiResult.title);
+      const slug = ensureUniqueArticleSlug(
+        baseSlug,
+        allArticles.map(article => normalizeExistingArticleSlug(article.slug || article.id)),
+      );
+
       await upsertArticle.mutateAsync({
         title: aiResult.title, summary: aiResult.summary, content: aiResult.content,
         category: aiResult.category || 'مقالات', section: aiSection,
-        author: 'عبدالملك حميد الكوكباني', source_name: 'شبام24',
+        author: 'عبدالملك حميد الكوكباني', source_name: 'شبام24', slug,
       });
       toast.success('تم نشر المقال');
       setAiResult(null);

@@ -2,6 +2,7 @@ import type { NewsArticle } from '@/data/mockNews';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Eye } from 'lucide-react';
 import { getSmartTimeAgo } from '@/lib/timeAgo';
+import { getArticlePath } from '@/hooks/useArticles';
 
 interface NewsSidebarProps {
   trending: NewsArticle[];
@@ -49,7 +50,7 @@ function SidebarSection({
         {articles.slice(0, 5).map((article, i) => (
           <Link
             key={article.id}
-            to={`/article/${(article as any).slug || article.id}`}
+            to={getArticlePath(article as any)}
             className="flex gap-3 group"
           >
             <span className="flex-shrink-0 w-7 h-7 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">

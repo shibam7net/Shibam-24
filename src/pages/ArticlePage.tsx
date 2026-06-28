@@ -13,7 +13,7 @@ import { getSmartTimeAgo } from '@/lib/timeAgo';
 import { useState, useEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
 import { absoluteSiteUrl } from '@/lib/site';
-
+import { getArticleSlug, getArticleUrl } from '@/lib/articleUrls';
 import { getProxiedImageUrl } from '@/lib/imageProxy';
 
 function HeroImage({ url, alt }: { url: string; alt: string }) {
@@ -71,8 +71,14 @@ export default function ArticlePage() {
   const { data: allSources = [] } = useSources();
 
   useEffect(() => {
-    if (article?.id) trackPageView(`/article/${slug || article.id}`, article.id);
-  }, [article?.id, slug]);
+    if (!article?.id) return;
+    trackPageView(getArticlePath(article), article.id);
+
+    const canonicalPath = getArticlePath(article);
+    if (slug && canonicalPath !== `/article/${slug}`) {
+      navigate(canonicalPath, { replace: true });
+    }
+  }, [article, navigate, slug]);
 
   if (!article && isLoading) return <ArticleSkeleton />;
 
@@ -138,12 +144,11 @@ export default function ArticlePage() {
     views: article.views,
     trendScore: article.trend_score,
     tags: article.tags || [],
-    slug: (article as any).slug,
+    slug: getArticleSlug(article as any),
   };
 
   const siteUrl = absoluteSiteUrl('/').replace(/\/$/, '');
-  const articleSlug = (article as any).slug || article.id;
-  const articleUrl = absoluteSiteUrl(`/article/${encodeURIComponent(articleSlug)}`);
+  const articleUrl = getArticleUrl(article as any);
   const metaTitle = cleanedTitle.slice(0, 110);
   const metaDesc = (cleanedSummary || cleanContent.slice(0, 180) || cleanedTitle).slice(0, 180);
 

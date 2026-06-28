@@ -5,6 +5,7 @@ import {
   BarChart3, Eye, TrendingUp, Radio, Calendar, Loader2,
   Users, Globe, Headphones, Activity, Newspaper, FileText,
 } from 'lucide-react';
+import { getArticlePath } from '@/hooks/useArticles';
 
 interface Overview {
   live_visitors: number;
@@ -185,7 +186,7 @@ export default function AnalyticsTab() {
           ) : (
             <div className="space-y-2">
               {topArticles.map((a, i) => (
-                <a key={i} href={`/article/${a.slug || a.article_id}`}
+                <a key={i} href={getArticlePath({ id: a.article_id, slug: a.slug, title: a.title })}
                    className="flex items-center gap-2 p-2 rounded-md hover:bg-muted transition-colors">
                   <span className="text-xs font-english text-muted-foreground w-5">{i + 1}.</span>
                   <span className="flex-1 text-xs font-arabic line-clamp-1">{a.title}</span>

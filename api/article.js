@@ -1,3 +1,5 @@
+import { getArticleUrl, getCanonicalArticleSlug, normalizeExistingArticleSlug, safeDecodeSlug } from './_lib/article-url.js';
+
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://pqtfipryditlsthdczkq.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxdGZpcHJ5ZGl0bHN0aGRjemtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTc4NzgsImV4cCI6MjA4OTI3Mzg3OH0.wdS_FIpMPlyQHbsi9f1Uxfd209cOmDgfOd24XpFD0PY';
 const SITE_URL = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://shibam-24.vercel.app').replace(/\/$/, '');
@@ -104,9 +106,15 @@ async function fetchArticle(slug) {
     Accept: 'application/json',
   };
 
+  const candidates = Array.from(new Set([
+    String(slug || '').trim(),
+    safeDecodeSlug(slug),
+    normalizeExistingArticleSlug(slug),
+  ].filter(Boolean)));
+
   const attempts = [
-    `${SUPABASE_URL}/rest/v1/articles?select=${encodedColumns}&slug=eq.${encodeURIComponent(slug)}&limit=1`,
-    `${SUPABASE_URL}/rest/v1/articles?select=${encodedColumns}&id=eq.${encodeURIComponent(slug)}&limit=1`,
+    ...candidates.map((candidate) => `${SUPABASE_URL}/rest/v1/articles?select=${encodedColumns}&slug=eq.${encodeURIComponent(candidate)}&limit=1`),
+    ...candidates.map((candidate) => `${SUPABASE_URL}/rest/v1/articles?select=${encodedColumns}&id=eq.${encodeURIComponent(candidate)}&limit=1`),
   ];
 
   for (const url of attempts) {
@@ -384,7 +392,7 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
         <nav class="nav">
           <a href="${SITE_URL}/">${isArabic ? 'الرئيسية' : 'Home'}</a>
           <a href="${SITE_URL}/articles">${isArabic ? 'الأخبار' : 'Articles'}</a>
-          <a href="${SITE_URL}/section/${encodeURIComponent(article.section || 'arabic')}">${escapeHtml(sectionLabel)}</a>
+          <a href="${SITE_URL}/section/${escapeHtml(article.section || 'arabic')}">${escapeHtml(sectionLabel)}</a>
         </nav>
       </div>
     </header>
@@ -435,8 +443,15 @@ export default async function handler(req, res) {
       return respond(res, 404, '<!doctype html><html lang="ar"><head><meta charset="utf-8"><title>المقال غير موجود</title></head><body>المقال غير موجود</body></html>');
     }
 
-    const canonicalSlug = article.slug || article.id;
-    const canonicalUrl = `${SITE_URL}/article/${encodeURIComponent(canonicalSlug)}`;
+    const canonicalSlug = getCanonicalArticleSlug(article);
+    const canonicalUrl = getArticleUrl(article);
+    const requestedSlug = normalizeExistingArticleSlug(slug);
+    if (requestedSlug && requestedSlug !== canonicalSlug) {
+      res.statusCode = 301;
+      res.setHeader('Location', canonicalUrl);
+      res.end();
+      return;
+    }
     const metaDescription = trimText(article.summary || article.content || article.title || '', 180);
     const sourceImage = extractFirstImageUrl(article);
     const ogImageUrl = getOgImageUrl(sourceImage);

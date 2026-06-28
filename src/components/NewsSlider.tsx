@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { NewsArticle } from '@/data/mockNews';
-import { decodeHtml , cleanTitle} from '@/lib/decodeHtml';
+import { cleanTitle } from '@/lib/decodeHtml';
 import { getProxiedImageUrl } from '@/lib/imageProxy';
+import { getArticlePath } from '@/hooks/useArticles';
 
 interface NewsSliderProps {
   articles: NewsArticle[];
@@ -41,7 +42,7 @@ export default function NewsSlider({ articles, isArabic = true }: NewsSliderProp
 
   return (
     <div className="relative w-full rounded-xl overflow-hidden bg-card border border-border shadow-sm">
-      <Link to={`/article/${(article as any).slug || article.id}`} className="block relative">
+      <Link to={getArticlePath(article as any)} className="block relative">
         {hasImage ? (
           <div className="relative w-full" style={{ maxHeight: '420px' }}>
             <img
