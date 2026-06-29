@@ -3,7 +3,8 @@ import { getArticleUrl, getCanonicalArticleSlug, hasPercentEncoding, normalizeEx
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://pqtfipryditlsthdczkq.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxdGZpcHJ5ZGl0bHN0aGRjemtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2OTc4NzgsImV4cCI6MjA4OTI3Mzg3OH0.wdS_FIpMPlyQHbsi9f1Uxfd209cOmDgfOd24XpFD0PY';
 const SITE_URL = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://shibam-24.vercel.app').replace(/\/$/, '');
-const SITE_NAME = 'Shibam24 - شبام24';
+const SITE_NAME = 'شبام 24';
+const SITE_NAME_ALT = 'Shibam24';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
 
 function decodeHtml(text = '') {
@@ -142,7 +143,7 @@ function buildJsonLd(article, canonicalUrl, ogImageUrl, metaDescription, lang) {
     mainEntityOfPage: canonicalUrl,
     author: {
       '@type': 'Person',
-      name: article.author || 'شبام24',
+      name: article.author || 'شبام 24',
     },
     publisher: {
       '@type': 'Organization',
@@ -168,9 +169,9 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
   const lang = isArabic ? 'ar' : 'en';
   const direction = isArabic ? 'rtl' : 'ltr';
   const published = formatDate(article.published_at, isArabic ? 'ar' : 'en');
-  const sourceName = article.source_name || SITE_NAME;
+  const sourceName = article.source_name || `${SITE_NAME} | ${SITE_NAME_ALT}`;
   const sourceUrl = safeUrl(article.source_url);
-  const pageTitle = `${title} | شبام24`;
+  const pageTitle = `${title} | شبام 24`;
   const socialTitle = title;
   const sectionLabel = article.category || (isArabic ? 'أخبار' : 'News');
   const encodedCanonical = encodeAttr(canonicalUrl);
@@ -222,10 +223,10 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>${encodedTitle}</title>
     <meta name="description" content="${encodedMetaDescription}" />
-    <meta name="author" content="${encodeAttr(article.author || 'شبام24')}" />
+    <meta name="author" content="${encodeAttr(article.author || 'شبام 24')}" />
     <meta name="robots" content="index,follow,max-image-preview:large" />
     <link rel="canonical" href="${encodedCanonical}" />
-    <meta property="article:author" content="${encodeAttr(article.author || 'شبام24')}" />
+    <meta property="article:author" content="${encodeAttr(article.author || 'شبام 24')}" />
     ${socialMeta}
     <script type="application/ld+json">${jsonLd}</script>
     <style>
@@ -388,7 +389,7 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
   <body>
     <header class="topbar">
       <div class="topbar-inner">
-        <a class="brand" href="${SITE_URL}/">شبام24 | Shibam24</a>
+        <a class="brand" href="${SITE_URL}/">شبام 24 | Shibam24</a>
         <nav class="nav">
           <a href="${SITE_URL}/">${isArabic ? 'الرئيسية' : 'Home'}</a>
           <a href="${SITE_URL}/articles">${isArabic ? 'الأخبار' : 'Articles'}</a>
@@ -404,7 +405,7 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
             <div class="eyebrow">${escapeHtml(sectionLabel)}</div>
             <h1>${escapeHtml(title)}</h1>
             <div class="meta">
-              <span>${escapeHtml(article.author || 'شبام24')}</span>
+              <span>${escapeHtml(article.author || 'شبام 24')}</span>
               <span>${escapeHtml(published)}</span>
               <span>${escapeHtml(sourceName)}</span>
             </div>

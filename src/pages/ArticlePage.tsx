@@ -166,10 +166,10 @@ export default function ArticlePage() {
     ...(socialImage ? { "image": [socialImage] } : {}),
     "datePublished": article.published_at,
     "dateModified": article.created_at,
-    "author": { "@type": "Person", "name": article.author || 'شبام24' },
+    "author": { "@type": "Person", "name": article.author || 'شبام 24' },
     "publisher": {
       "@type": "Organization",
-      "name": "Shibam24 - شبام24",
+      "name": "شبام 24",
       "logo": { "@type": "ImageObject", "url": `${siteUrl}/logo.png` }
     },
     "description": metaDesc,
@@ -192,7 +192,7 @@ export default function ArticlePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
-        <title>{`${metaTitle} | شبام24`}</title>
+        <title>{`${metaTitle} | شبام 24`}</title>
         <meta name="description" content={metaDesc} />
         <meta name="robots" content={`${robots},max-image-preview:large`} />
         <link rel="canonical" href={articleUrl} />
@@ -200,7 +200,7 @@ export default function ArticlePage() {
         <meta property="og:description" content={metaDesc} />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Shibam24 - شبام24" />
+        <meta property="og:site_name" content="شبام 24" />
         <meta property="og:locale" content={isArabic ? 'ar_AR' : 'en_US'} />
         <meta property="article:published_time" content={article.published_at} />
         <meta property="article:modified_time" content={article.created_at} />
@@ -293,7 +293,7 @@ export default function ArticlePage() {
                   {(article.author || 'ش').charAt(0)}
                 </div>
                 <div className="flex flex-col">
-                  <span className={`font-semibold text-foreground ${isArabic ? 'font-arabic' : 'font-english'}`}>{article.author || 'شبام24'}</span>
+                  <span className={`font-semibold text-foreground ${isArabic ? 'font-arabic' : 'font-english'}`}>{article.author || 'شبام 24'}</span>
                   <span className="text-xs">{getSmartTimeAgo(article.published_at, isArabic)}</span>
                 </div>
               </div>

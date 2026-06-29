@@ -11,10 +11,10 @@ export default function TermsPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
         <title>{`شروط الاستخدام | ${siteMetaTitle}`}</title>
-        <meta name="description" content="شروط استخدام موقع شبام24 الإخباري: حقوق النشر، مسؤولية المحتوى، الاستخدام المقبول، وقواعد إعادة النشر." />
+        <meta name="description" content="شروط استخدام موقع شبام 24 الإخباري: حقوق النشر، مسؤولية المحتوى، الاستخدام المقبول، وقواعد إعادة النشر." />
         <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
-        <meta property="og:title" content="شروط الاستخدام — شبام24" />
+        <meta property="og:title" content="شروط الاستخدام — شبام 24" />
         <meta property="og:url" content={url} />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',

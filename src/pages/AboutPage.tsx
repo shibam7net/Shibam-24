@@ -11,17 +11,17 @@ export default function AboutPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
         <title>{`من نحن | ${siteMetaTitle}`}</title>
-        <meta name="description" content="شبام24 منصة إخبارية عربية وعالمية مستقلة تقدم أخبارًا عاجلة وتقارير وتحليلات موثوقة على مدار الساعة." />
+        <meta name="description" content="شبام 24 منصة إخبارية عربية وعالمية مستقلة تقدم أخبارًا عاجلة وتقارير وتحليلات موثوقة على مدار الساعة." />
         <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
-        <meta property="og:title" content="من نحن — شبام24" />
+        <meta property="og:title" content="من نحن — شبام 24" />
         <meta property="og:url" content={url} />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'AboutPage',
-          name: 'من نحن — شبام24',
+          name: 'من نحن — شبام 24',
           url,
-          publisher: { '@type': 'NewsMediaOrganization', name: 'شبام24', url: absoluteSiteUrl('/') },
+          publisher: { '@type': 'NewsMediaOrganization', name: 'شبام 24', url: absoluteSiteUrl('/') },
         })}</script>
       </Helmet>
       <SiteHeader />

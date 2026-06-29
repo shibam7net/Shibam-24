@@ -37,7 +37,7 @@ export default async function handler(_req, res) {
     <loc>${xmlEscape(getArticleUrl(article))}</loc>
     <news:news>
       <news:publication>
-        <news:name>Shibam24</news:name>
+        <news:name>شبام 24</news:name>
         <news:language>${lang}</news:language>
       </news:publication>
       <news:publication_date>${xmlEscape(new Date(article.published_at).toISOString())}</news:publication_date>

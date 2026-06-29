@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+Sitemap: https://shibam-24.vercel.app/sitemap.xml
+Sitemap: https://shibam-24.vercel.app/news-sitemap.xml

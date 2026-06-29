@@ -11,10 +11,10 @@ export default function PrivacyPolicyPage() {
     <div className="min-h-screen bg-background flex flex-col" dir="rtl">
       <Helmet>
         <title>{`سياسة الخصوصية | ${siteMetaTitle}`}</title>
-        <meta name="description" content="سياسة الخصوصية لموقع شبام24: كيف نجمع البيانات، كيف نستخدمها، ملفات تعريف الارتباط، حقوق المستخدمين، وحماية المعلومات." />
+        <meta name="description" content="سياسة الخصوصية لموقع شبام 24: كيف نجمع البيانات، كيف نستخدمها، ملفات تعريف الارتباط، حقوق المستخدمين، وحماية المعلومات." />
         <meta name="robots" content={robots} />
         <link rel="canonical" href={url} />
-        <meta property="og:title" content="سياسة الخصوصية — شبام24" />
+        <meta property="og:title" content="سياسة الخصوصية — شبام 24" />
         <meta property="og:url" content={url} />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',

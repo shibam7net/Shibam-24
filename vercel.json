@@ -11,10 +11,6 @@
       "destination": "/api/news-sitemap"
     },
     {
-      "source": "/robots.txt",
-      "destination": "/api/robots"
-    },
-    {
       "source": "/article/(.*)",
       "has": [
         {

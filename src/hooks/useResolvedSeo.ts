@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
-export const DEFAULT_SITE_TITLE = 'شبام24 | أخبار عربية وعالمية على مدار الساعة';
-export const DEFAULT_SITE_DESCRIPTION = 'شبام24 منصة إخبارية احترافية تغطي الأخبار العربية والعالمية لحظة بلحظة، مع السياسة والاقتصاد والرياضة والتقنية والراديو المباشر وأرشيف قابل للفهرسة.';
+export const DEFAULT_SITE_TITLE = 'شبام 24 | أخبار عربية وعالمية على مدار الساعة';
+export const DEFAULT_SITE_DESCRIPTION = 'شبام 24 منصة إخبارية احترافية تغطي الأخبار العربية والعالمية لحظة بلحظة، مع السياسة والاقتصاد والرياضة والتقنية والراديو المباشر وأرشيف قابل للفهرسة.';
 export const DEFAULT_ROBOTS = 'index,follow';
 
 export function useResolvedSeo() {

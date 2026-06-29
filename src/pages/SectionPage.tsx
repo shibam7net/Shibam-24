@@ -94,7 +94,7 @@ export default function SectionPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
         <title>{`${titleWithPage} | ${siteMetaTitle}`}</title>
-        <meta name="description" content={`${pageTitle} - شبام24 منصة إخبارية شاملة.`} />
+        <meta name="description" content={`${pageTitle} - شبام 24 منصة إخبارية شاملة.`} />
         <meta name="robots" content={robots} />
         <link rel="canonical" href={canonical} />
         <meta property="og:title" content={titleWithPage} />

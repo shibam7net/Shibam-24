@@ -25,7 +25,7 @@ export default function ArticlesPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
         <title>{`مقالات | ${siteMetaTitle}`}</title>
-        <meta name="description" content="مقالات وتحليلات وآراء من شبام24 - أحدث المقالات العربية والعالمية" />
+        <meta name="description" content="مقالات وتحليلات وآراء من شبام 24 - أحدث المقالات العربية والعالمية" />
         <meta name="robots" content={robots} />
         <link rel="canonical" href={absoluteSiteUrl("/articles")} />
       </Helmet>
