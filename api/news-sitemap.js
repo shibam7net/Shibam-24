@@ -7,8 +7,10 @@ function respond(res, status, body, contentType = 'application/xml; charset=utf-
   res.end(body);
 }
 
+const XML_STYLESHEET = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>';
+
 function buildFallbackNewsSitemap() {
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${XML_STYLESHEET}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
 </urlset>`;
@@ -25,7 +27,7 @@ export default async function handler(_req, res) {
       gtePublishedAt: since,
     });
 
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n${XML_STYLESHEET}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">`;
 

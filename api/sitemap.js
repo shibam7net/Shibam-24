@@ -9,8 +9,10 @@ function respond(res, status, body, contentType = 'application/xml; charset=utf-
   res.end(body);
 }
 
+const XML_STYLESHEET = '<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>';
+
 function buildFallbackSitemap(now = new Date().toISOString()) {
-  return `<?xml version="1.0" encoding="UTF-8"?>
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${XML_STYLESHEET}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${xmlEscape(`${SITE_URL}/`)}</loc>
@@ -44,7 +46,7 @@ export default async function handler(_req, res) {
     const globalPages = Math.max(1, Math.ceil(globalCount / PAGE_SIZE));
     const latestArticleUpdate = articles?.[0]?.created_at || articles?.[0]?.published_at || new Date().toISOString();
 
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n${XML_STYLESHEET}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${xmlEscape(`${SITE_URL}/`)}</loc>
