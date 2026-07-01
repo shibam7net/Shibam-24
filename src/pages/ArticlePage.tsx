@@ -6,11 +6,11 @@ import ShareButtons from '@/components/ShareButtons';
 import ReadingProgress from '@/components/ReadingProgress';
 import { useArticle, useArticles, getArticlePath } from '@/hooks/useArticles';
 import { useSources } from '@/hooks/useSources';
-import { Calendar, Eye, ArrowRight, ChevronRight, ExternalLink, Clock, Tag } from 'lucide-react';
+import { Calendar, ArrowRight, ChevronRight, ExternalLink, Clock, Tag } from 'lucide-react';
 import { decodeHtml, stripHtml, cleanTitle, extractMedia } from '@/lib/decodeHtml';
 import VideoPlayer from '@/components/VideoPlayer';
 import { getSmartTimeAgo } from '@/lib/timeAgo';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { trackPageView } from '@/lib/analytics';
 import { absoluteSiteUrl } from '@/lib/site';
 import { getArticleSlug, getArticleUrl } from '@/lib/articleUrls';
@@ -72,6 +72,12 @@ export default function ArticlePage() {
   const { data: allArticles = [] } = useArticles();
   const { data: allSources = [] } = useSources();
   const { robots } = useResolvedSeo();
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [slug]);
 
   useEffect(() => {
     if (!article?.id) return;
@@ -316,7 +322,6 @@ export default function ArticlePage() {
               </div>
               <span className="hidden sm:inline-flex items-center gap-1"><Calendar className="w-4 h-4" />{publishDate}</span>
               <span className="inline-flex items-center gap-1"><Clock className="w-4 h-4" />{readingMinutes} {isArabic ? 'دقيقة قراءة' : 'min read'}</span>
-              <span className="inline-flex items-center gap-1"><Eye className="w-4 h-4" />{article.views.toLocaleString()}</span>
             </div>
 
             {/* Summary as lead paragraph */}

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ScrollToTop from "@/components/ScrollToTop";
 import { HelmetProvider } from "react-helmet-async";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -58,6 +59,7 @@ const App = () => (
             <Suspense fallback={null}><KeyboardShortcuts /></Suspense>
             <RealtimeSubscriber />
             <BrowserRouter basename={routerBasename}>
+              <ScrollToTop />
               <RouteTracker />
               <Suspense fallback={null}>
                 <Routes>
