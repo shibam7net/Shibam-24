@@ -10,13 +10,14 @@ function articleUrl(article: NewsArticle) {
 
 export function shareToWhatsApp(article: NewsArticle) {
   const url = articleUrl(article);
-  const text = `${article.title} - ${SITE_NAME}\n\n${article.summary}\n\n${url}\n\n${HASHTAG}`;
+  // Keep the URL first and avoid long prefixed text so WhatsApp reliably generates a link preview.
+  const text = `${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 export function shareToTwitter(article: NewsArticle) {
   const url = articleUrl(article);
-  const text = `${article.title} - ${SITE_NAME} ${HASHTAG}`;
+  const text = `${article.title} - ${SITE_NAME}`;
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
 }
 
@@ -33,6 +34,6 @@ export function shareToFacebook(article: NewsArticle) {
 
 export function copyLink(article: NewsArticle) {
   const url = articleUrl(article);
-  const text = `${article.title} - ${SITE_NAME}\n${url}`;
-  navigator.clipboard.writeText(text);
+  // Copy the raw URL only. Several apps fail to build a rich preview when extra text is included.
+  navigator.clipboard.writeText(url);
 }

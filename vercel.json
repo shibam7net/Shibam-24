@@ -16,7 +16,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(facebookexternalhit|Facebot|Twitterbot|Xbot|WhatsApp|TelegramBot|Slackbot|Discordbot|LinkedInBot|SkypeUriPreview|Googlebot|bingbot).*"
+          "value": ".*(facebookexternalhit|Facebot|meta-externalagent|meta-externalfetcher|Twitterbot|Xbot|WhatsApp|TelegramBot|Slackbot|Slack-ImgProxy|Discordbot|LinkedInBot|SkypeUriPreview|Googlebot|bingbot).*"
         }
       ],
       "destination": "/api/article?slug=$1"

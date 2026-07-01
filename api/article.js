@@ -207,6 +207,8 @@ function renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl) {
     <meta property="article:section" content="${encodeAttr(sectionLabel)}" />
     <meta property="og:image" content="${encodedOgImage}" />
     <meta property="og:image:secure_url" content="${encodedOgImage}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="${encodedImageAlt}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@Shibam24" />
