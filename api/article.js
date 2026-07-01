@@ -80,13 +80,22 @@ function safeUrl(url) {
   }
 }
 
+function isSameSiteUrl(value) {
+  try {
+    return new URL(value).hostname === new URL(SITE_URL).hostname;
+  } catch {
+    return false;
+  }
+}
+
 function getOgImageUrl(imageUrl) {
   const raw = decodeHtml(String(imageUrl || '')).trim();
   if (!raw) return DEFAULT_OG_IMAGE;
   if (raw.startsWith('/')) return `${SITE_URL}${raw}`;
   const safe = safeUrl(raw);
   if (!safe) return DEFAULT_OG_IMAGE;
-  return safe;
+  if (isSameSiteUrl(safe) || safe.startsWith(`${SITE_URL}/api/image-proxy?`)) return safe;
+  return `${SITE_URL}/api/image-proxy?url=${encodeURIComponent(safe)}`;
 }
 
 function formatDate(value, locale = 'ar') {

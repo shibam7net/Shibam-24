@@ -133,11 +133,24 @@ export default function ArticlePage() {
   const videoPoster = media.poster || article.image_url || undefined;
   const heroImage = article.image_url || media.imageUrl || null;
   const featuredSocialImage = String(article.image_url || '').trim();
-  const socialImage = featuredSocialImage
-    ? (/^https?:\/\//i.test(featuredSocialImage)
-        ? featuredSocialImage
-        : absoluteSiteUrl(featuredSocialImage.startsWith('/') ? featuredSocialImage : `/${featuredSocialImage}`))
-    : absoluteSiteUrl('/article-share-default.png');
+  const socialImage = (() => {
+    if (!featuredSocialImage) return absoluteSiteUrl('/article-share-default.png');
+
+    const normalized = /^https?:\/\//i.test(featuredSocialImage)
+      ? featuredSocialImage
+      : absoluteSiteUrl(featuredSocialImage.startsWith('/') ? featuredSocialImage : `/${featuredSocialImage}`);
+
+    try {
+      const imageUrl = new URL(normalized);
+      const siteUrl = new URL(absoluteSiteUrl('/'));
+      if (imageUrl.hostname === siteUrl.hostname || normalized.startsWith(`${siteUrl.origin}/api/image-proxy?`)) {
+        return normalized;
+      }
+      return absoluteSiteUrl(`/api/image-proxy?url=${encodeURIComponent(normalized)}`);
+    } catch {
+      return absoluteSiteUrl('/article-share-default.png');
+    }
+  })();
   const cleanedTitle = cleanTitle(article.title);
   const cleanedSummary = stripHtml(decodeHtml(article.summary || ''));
 
