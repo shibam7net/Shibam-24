@@ -132,8 +132,12 @@ export default function ArticlePage() {
   const videoUrl = (article as any).video_url || media.videoUrl;
   const videoPoster = media.poster || article.image_url || undefined;
   const heroImage = article.image_url || media.imageUrl || null;
-  const socialImageSource = article.image_url || media.imageUrl || null;
-  const socialImage = getProxiedImageUrl(socialImageSource) || absoluteSiteUrl('/og-image.png');
+  const featuredSocialImage = String(article.image_url || '').trim();
+  const socialImage = featuredSocialImage
+    ? (/^https?:\/\//i.test(featuredSocialImage)
+        ? featuredSocialImage
+        : absoluteSiteUrl(featuredSocialImage.startsWith('/') ? featuredSocialImage : `/${featuredSocialImage}`))
+    : absoluteSiteUrl('/article-share-default.png');
   const cleanedTitle = cleanTitle(article.title);
   const cleanedSummary = stripHtml(decodeHtml(article.summary || ''));
 

@@ -5,7 +5,7 @@ const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.e
 const SITE_URL = (process.env.SITE_URL || process.env.VITE_SITE_URL || 'https://shibam-24.vercel.app').replace(/\/$/, '');
 const SITE_NAME = 'شبام 24';
 const SITE_NAME_ALT = 'Shibam24';
-const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png`;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/article-share-default.png`;
 
 function decodeHtml(text = '') {
   return String(text)
@@ -81,9 +81,12 @@ function safeUrl(url) {
 }
 
 function getOgImageUrl(imageUrl) {
-  const safe = safeUrl(imageUrl);
+  const raw = decodeHtml(String(imageUrl || '')).trim();
+  if (!raw) return DEFAULT_OG_IMAGE;
+  if (raw.startsWith('/')) return `${SITE_URL}${raw}`;
+  const safe = safeUrl(raw);
   if (!safe) return DEFAULT_OG_IMAGE;
-  return `${SITE_URL}/api/image-proxy?url=${encodeURIComponent(safe)}`;
+  return safe;
 }
 
 function formatDate(value, locale = 'ar') {
@@ -469,8 +472,7 @@ export default async function handler(req, res) {
       return;
     }
     const metaDescription = trimText(article.summary || article.content || article.title || '', 180);
-    const sourceImage = extractFirstImageUrl(article);
-    const ogImageUrl = getOgImageUrl(sourceImage);
+    const ogImageUrl = getOgImageUrl(article.image_url);
 
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600');
     return respond(res, 200, renderArticleHtml(article, canonicalUrl, metaDescription, ogImageUrl));
